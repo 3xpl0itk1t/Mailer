@@ -7,8 +7,8 @@ import (
 	"os/signal"
 	"syscall"
 
-	// "github.com/gofiber/fiber/middleware"
 	"github.com/gofiber/fiber/v2"
+	"github.com/gofiber/fiber/v2/middleware/logger"
 	"github.com/joho/godotenv"
 )
 
@@ -26,7 +26,10 @@ func StartServer() {
 	// Start the server
 	PORT := os.Getenv("PORT")
 	app := fiber.New()
-	// app.Use(middleware.Logger())
+	app.Use(logger.New(logger.Config{
+		// For more options, see the Config section
+		Format: "${pid} ${locals:requestid} ${status} - ${method} ${path}​\n",
+	}))
 	app.Get("/", func(c *fiber.Ctx) error {
 		return c.JSON(fiber.Map{
 			"message": "Hello, world!",
