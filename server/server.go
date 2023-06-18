@@ -26,6 +26,8 @@ func StartServer() {
 	// Start the server
 	PORT := os.Getenv("PORT")
 	app := fiber.New()
+
+	// Logger for logging requests
 	app.Use(logger.New(logger.Config{
 		// For more options, see the Config section
 		Format: "${pid} ${locals:requestid} ${status} - ${method} ${path}​\n",
