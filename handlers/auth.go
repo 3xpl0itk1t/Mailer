@@ -22,18 +22,18 @@ func SignupHandler(c *fiber.Ctx) error {
 		})
 	}
 
-		// Check if user with the same email already exists
-		existingUser := bson.M{"email": usr.Email}
-		count, err := collection.CountDocuments(context.Background(), existingUser)
-		if err != nil {
-			log.Fatal(err)
-		}
-	
-		if count > 0 {
-			return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
-				"error": "user with this email already exists",
-			})
-		}
+	// Check if user with the same email already exists
+	existingUser := bson.M{"email": user.Email}
+	count, err := collection.CountDocuments(context.Background(), existingUser)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	if count > 0 {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+			"error": "user with this email already exists",
+		})
+	}
 	// Encrypt the password
 	hashedAuth, err := bcrypt.GenerateFromPassword([]byte(user.Auth), bcrypt.DefaultCost)
 	if err != nil {
@@ -130,4 +130,3 @@ func generateToken(userID string) string {
 
 	return tokenString
 }
-
