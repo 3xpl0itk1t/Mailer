@@ -2,10 +2,13 @@ package server
 
 import (
 	"csi_mailer/handlers"
+	"csi_mailer/middlewares"
 	"log"
 	"os"
 	"os/signal"
 	"syscall"
+
+	"csi_mailer/config"
 
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/logger"
@@ -27,11 +30,10 @@ func StartServer() {
 	PORT := os.Getenv("PORT")
 	app := fiber.New()
 
+	// Note: This is just an example, please use a secure secret key
+	jwt := middlewares.NewAuthMiddleware(config.SECRET_KEY)
 	// Logger for logging requests
-	app.Use(logger.New(logger.Config{
-		// For more options, see the Config section
-		Format: "${pid} ${locals:requestid} ${status} - ${method} ${path}​\n",
-	}))
+	app.Use(logger.New())
 	app.Get("/", func(c *fiber.Ctx) error {
 		return c.JSON(fiber.Map{
 			"message": "Hello, world!",
@@ -39,7 +41,7 @@ func StartServer() {
 	})
 	app.Post("/signup", handlers.SignupHandler)
 	app.Get("/login", handlers.LoginHandler)
-	app.Post("/sendmail", handlers.MailHandler)
+	app.Post("/sendmail", jwt, handlers.MailHandler)
 	// Run the server in a goroutine
 	go func() {
 		err := app.Listen(":" + PORT)

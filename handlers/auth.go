@@ -2,21 +2,16 @@ package handlers
 
 import (
 	"context"
+	"csi_mailer/config"
 	"csi_mailer/models"
 	"log"
-	"os"
 
 	"github.com/dgrijalva/jwt-go"
 	"github.com/gofiber/fiber/v2"
-	jwtware "github.com/gofiber/jwt/v2"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"golang.org/x/crypto/bcrypt"
 )
-
-var AUTHENTICATION string = os.Getenv("AUTH_CODE")
-var SECRET_KEY string = os.Getenv("SECRET_KEY")
-var TOKEN string
 
 // SignupHandler is used to create a new user account
 func SignupHandler(c *fiber.Ctx) error {
@@ -47,7 +42,7 @@ func SignupHandler(c *fiber.Ctx) error {
 		"email":      user.Email,
 		"password":   string(hashedPassword),
 	}
-	if user.Auth != AUTHENTICATION {
+	if user.Auth != config.AUTHENTICATION {
 		return c.Status(fiber.StatusUnauthorized).JSON(fiber.Map{
 			"message": "Authentication failed",
 		})
@@ -116,7 +111,7 @@ func generateToken(userID string) string {
 
 	// Generate the JWT token with a secret key
 	// Replace "your-secret-key" with your own secret key for signing the token
-	tokenString, err := token.SignedString([]byte(SECRET_KEY))
+	tokenString, err := token.SignedString([]byte(config.SECRET_KEY))
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -124,9 +119,3 @@ func generateToken(userID string) string {
 	return tokenString
 }
 
-func AuthRequired() func(c *fiber.Ctx) error {
-	return jwtware.New(jwtware.Config{
-		SigningKey: []byte(SECRET_KEY),
-	})
-
-}
