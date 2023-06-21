@@ -1,0 +1,9 @@
+# Ignore version control system directories
+.git
+.gitignore
+.svn
+.hg
+.hgignore
+
+# Ignore IDE/project configuration files
+.vscode
